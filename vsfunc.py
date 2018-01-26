@@ -26,32 +26,6 @@ import re
 
 import postgresql
 
-gamessql = """
-select tm.team_name, 
-  sum(win) as win, 
-  sum(loss) as loss, 
-  sum(draw) as draw, 
-  sum(goals_s) as goals_s, 
-  sum(goals_m) as goals_m,
-  sum(win)*3 + sum(draw) as points
-from (
-select g.id_team_one as id_team, 
-  CASE WHEN g.goals_one>g.goals_two THEN 1 ELSE 0 END as win,
-  CASE WHEN g.goals_one<g.goals_two THEN 1 ELSE 0 END as loss,
-  CASE WHEN g.goals_one=g.goals_two THEN 1 ELSE 0 END as draw,
-  g.goals_one as goals_s,
-  g.goals_two as goals_m
-from games g where id_tournament=5
-union all
-select g.id_team_two as id_team, 
-  CASE WHEN g.goals_one<g.goals_two THEN 1 ELSE 0 END as win,
-  CASE WHEN g.goals_one>g.goals_two THEN 1 ELSE 0 END as loss,
-  CASE WHEN g.goals_one=g.goals_two THEN 1 ELSE 0 END as draw,
-  g.goals_two as goals_s,
-  g.goals_one as goals_m
-from games g where id_tournament=5
-) t, teams tm where tm.team_id=t.id_team group by tm.team_name order  by points desc;
-"""
 
 def getfantasyid(line):
     key, sep, value = line.strip().partition(";")

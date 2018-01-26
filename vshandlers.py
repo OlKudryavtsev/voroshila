@@ -481,7 +481,6 @@ def keyboardecho(bot, update):
     elif echotext == "🗓Турнирная таблица":
         chat_id = str(update.message.chat_id)
         tables = gettournamenttable(6)
-        print(tabulate(tables))
         tabletxt = ""
         row = ""
         for r in tables:
@@ -525,7 +524,6 @@ def teams(bot, update):
         else:
             teams_3.append(team)
         i = i + 1
-    print(teams_keyboard)
     reply_markup = ReplyKeyboardMarkup(teams_keyboard, one_time_keyboard=True)
     time.sleep(2)
     update.message.reply_text('Можешь посмотреть результаты матчей другой команды либо вернуться назад:',
@@ -595,18 +593,15 @@ def autoready2play(bot, update, chat_id):
         gamecalendar(bot, update)
 
 def next5games(bot, update):
-    print("In next 5 games")
     chat_id = update.message.chat_id
     date = getnextsunday()
     cur_year = datetime.date.today().year
     matches = getmatchschedule('', '2018', 5, 0)
-    print(len(matches))
     match_text = ""
     for match in matches:
         date = ""
         if match[4]:
             date = " (" + str(match[4]) + ")"
-            print(date)
         match_text = match_text + "\n" + str(match[0]) + str(match[6]) + " - " + str(match[7]) + str(match[1]) + str(date)
     update.message.reply_text("Ближайшие 5️⃣ матчей по расписанию:")
     time.sleep(1)
