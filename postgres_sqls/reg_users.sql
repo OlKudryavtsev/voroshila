@@ -1,0 +1,11 @@
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (1, '186972507', 'Alex', 'Shevchenko', 'Александр Шевченко', 't', 't');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (2, '147860673', 'Вадим', 'Швецов', 'Вадим Швецов', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (3, '244378697', 'Anton', 'Pikovskiy', 'Антон Пиковский', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (4, '453023784', '777', '777', 'Геворг Гезалян', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (5, '29545080', 'Tisha', 'Fdc', 'Дмитрий Самойлов', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (6, '230308082', 'Олег', 'Кудрявцев', 'Олег Кудрявцев', 't', 't');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (7, '433547414', 'Даниил', 'Кузьмин', 'Даниил Кузьмин', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (8, '462877044', 'Max', 'Kryukov', 'Максим Крюков', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (9, '424775672', 'Stanislav', 'Borisov', 'Станислав Борисов', 'f', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (10, '342304476', 'Anton', 'Borisov', 'Антон Борисов', 't', 'f');
+INSERT INTO voroshila.public.reg_users(user_key, chat_id, first_name, last_name, full_name, vs18, is_admin) VALUES (11, '43789596', 'Alexey', 'Duplyakov', 'Алексей Дупляков', 't', 'f');
