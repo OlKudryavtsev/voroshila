@@ -255,7 +255,7 @@ def yearchoise(bot, update):
 def msg(bot, update, args):
     """Send a message when the command /sendmessage is issued."""
     sender_chat_id = update.message.chat_id
-    msg = ""
+    msg = ' '.join(args)
     for arg in args:
         msg = msg + " " + arg
     chat_ids, firstnames, fullnames = getchatids()
@@ -271,9 +271,9 @@ def msg(bot, update, args):
 def vsmsg(bot, update, args):
     """Send a message when the command /sendmessage is issued."""
     sender_chat_id = update.message.chat_id
-    msg = ""
-    for arg in args:
-        msg = msg + " " + arg
+    msg = ' '.join(args)
+    #for arg in args:
+    #    msg = msg + " " + arg
     chat_ids, firstnames, fullnames = getvschatids()
     i = 0
     for chat_id, name in zip(chat_ids, firstnames):
@@ -284,7 +284,7 @@ def vsmsg(bot, update, args):
     msginsert(sender_chat_id, '', msg)
 
 def msgto(bot, update, args):
-    """Send a message when the command /sendmessage is issued."""
+    """Send a message when the command /msgto is issued."""
     sender_chat_id = update.message.chat_id
     if not args:
         msg_help = """
@@ -303,6 +303,7 @@ def msgto(bot, update, args):
         msg = ""
         j = 0
         chat_id = args[0]
+
         for arg in args:
             if j > 0:
                 msg = msg + " " + arg
@@ -428,8 +429,8 @@ def keyboardecho(bot, update):
                     date_text = str(match[7]) + ": "
                 else:
                     date_text = ""
-                match_text = match_text + "\n" + date_text + str(match[1]) + " " + str(
-                    match[3]) + " - " + str(match[4]) + " " + str(match[6]) + ". Тур " + str(match[8])
+                match_text = match_text + "\n" + date_text + str(match[1]) + str(
+                    match[3]) + " - " + str(match[6]) + str(match[4]) + " " + ". Тур " + str(match[8])
             update.message.reply_text("На ближайшее воскресенье запланировано проведение следующих матчей:")
             time.sleep(1)
             update.message.reply_text(match_text)
@@ -454,12 +455,16 @@ def keyboardecho(bot, update):
         gameresult(bot, update)
 
     elif echotext == "👋🏽Готов!":
-        ready2play(bot, update)
-        #gamecalendar(bot, update)
+        ready2play(bot, update, True)
+        gamecalendar(bot, update)
+
+    elif echotext == "🚷Не готов":
+        ready2play(bot, update, False)
+        gamecalendar(bot, update)
 
     elif echotext == "🚷Отменить готовность":
-        ready2play(bot, update)
-        #gamecalendar(bot, update)
+        ready2play(bot, update, False)
+        gamecalendar(bot, update)
 
     elif echotext == "⭕Свои оставшиеся матчи":
         chat_id = str(update.message.chat_id)
@@ -532,14 +537,22 @@ def teams(bot, update):
 
 def gamecalendar(bot, update):
     chat_id = update.message.chat_id
-    is_ready = isready(chat_id, str(getnextsunday()))
-    if is_ready > 0:
+    is_answer = answaboutready(chat_id, str(getnextsunday()))
+    is_ready = isready(chat_id, str(getnextsunday()), True)
+    is_not_ready = isready(chat_id, str(getnextsunday()), False)
+    if is_answer == 0:
+        reply_keyboard = [["👋🏽Готов!", "🚷Не готов", ],
+                          ["🔜Ближайшие 5️⃣ матчей"],
+                          ["⭕Свои оставшиеся матчи", "✅Свои сыгранные матчи"],
+                          ["🔙Назад"]]
+        text = "‼️Обязательно‼️\nЕсли ты Готов играть в ближайшее воскресенье " + str(getnextsunday()) + ", жми 👋🏽Готов!\nЕсли нет - жми 🚷Не готов"
+    elif is_ready > 0:
         reply_keyboard = [["🚷Отменить готовность"],
                           ["🔜Ближайшие 5️⃣ матчей"],
                           ["⭕Свои оставшиеся матчи", "✅Свои сыгранные матчи"],
                           ["🔙Назад"]]
         text = "Также можешь посмотреть 👇🏽"
-    else:
+    elif is_not_ready > 0:
         reply_keyboard = [['👋🏽Готов!'],
                           ["🔜Ближайшие 5️⃣ матчей"],
                           ["⭕Свои оставшиеся матчи", "✅Свои сыгранные матчи"],
@@ -558,12 +571,11 @@ def gameresult(bot, update):
     update.message.reply_text(text, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
 
-def ready2play(bot, update):
+def ready2play(bot, update, state):
     chat_id = update.message.chat_id
     cur_year = datetime.date.today().year
-    is_ready = isready(chat_id, str(getnextsunday()))
-    if is_ready > 0:
-        delfromready(chat_id, str(getnextsunday()))
+    ins2ready(chat_id, str(getnextsunday()), state)
+    if not state:
         update.message.reply_text("🙁Очень жаль! Надеюсь, что в следующее воскресенье у тебя получится!")
         for chat_id in LIST_OF_ADMINS:
             bot.send_message(chat_id=chat_id,
@@ -573,30 +585,28 @@ def ready2play(bot, update):
         game_id = getgameidbyteamid(team_id)
         arr = ["date", game_id]
         set(bot, update, arr)
-        gamecalendar(bot, update)
-
     else:
-        ins2ready(chat_id, str(getnextsunday()))
         update.message.reply_text("👏Спасибо, что сообщил! Буду иметь ввиду !👍")
         for chat_id in LIST_OF_ADMINS:
             bot.send_message(chat_id=chat_id,
                              text=update.message.from_user.first_name + " " + update.message.from_user.last_name + " сообщил о своей готовности сыграть в ближайшее воскресенье " + str(
                                  getnextsunday()))
-        gamecalendar(bot, update)
+    #gamecalendar(bot, update)
+
 
 def autoready2play(bot, update, chat_id):
-    is_ready = isready(chat_id, str(getnextsunday()))
+    is_ready = isready(chat_id, str(getnextsunday()), True)
     if is_ready > 0:
         pass
     else:
-        ins2ready(chat_id, str(getnextsunday()))
+        ins2ready(chat_id, str(getnextsunday()), True)
         gamecalendar(bot, update)
 
 def next5games(bot, update):
     chat_id = update.message.chat_id
     date = getnextsunday()
     cur_year = datetime.date.today().year
-    matches = getmatchschedule('', '2018', 5, 0)
+    matches = getmatchschedule('', cur_year, 5, 0)
     match_text = ""
     for match in matches:
         date = ""

@@ -1,1 +1,8 @@
 python-telegram-bot для турнира Ворошиловский стрелок (в будущем и для Дерби)
+
+vsmain.py - функция main: вызов всех хэндлеров;
+vshandlers.py - определение всех хэндлеров и логики бота;
+vsfunc.py - вспомогательные функции (в основном sql-запросы к БД);
+
+postgres_sqls/table_ddl.sql - sql-statement for create tables used by Bot;
+postgres_sqls/*.sql - backup content

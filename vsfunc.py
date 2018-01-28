@@ -186,15 +186,25 @@ def getnextsunday():
     sunday = today + datetime.timedelta((6 - today.weekday()) % 7)
     return sunday
 
-def isready(chat_id, date):
+def isready(chat_id, date, state):
+    db = dbconnect()
+    select = "select count(rdy_id) from voroshila.public.ready2play where chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "' and is_ready = " + str(state)
+    res = db.query(select)
+    return res[0][0]
+
+def answaboutready(chat_id, date):
     db = dbconnect()
     select = "select count(rdy_id) from voroshila.public.ready2play where chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "'"
     res = db.query(select)
     return res[0][0]
 
-def ins2ready(chat_id, date):
+def ins2ready(chat_id, date, state):
     db = dbconnect()
-    insert = "INSERT INTO voroshila.public.ready2play (chat_id, date) VALUES ('" + str(chat_id) + "', '" + str(date) + "')"
+    isanswer = answaboutready(chat_id, date)
+    if isanswer > 0:
+        insert = "UPDATE voroshila.public.ready2play set is_ready=" + str(state) + " WHERE chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "'"
+    else:
+        insert = "INSERT INTO voroshila.public.ready2play (chat_id, date, is_ready) VALUES ('" + str(chat_id) + "', '" + str(date) + "', " + str(state) + ")"
     db.query(insert)
 
 def delfromready(chat_id, date):
@@ -291,6 +301,6 @@ def getfullnamebychatid(chat_id):
 
 def getwhoisready(year, date):
     db = dbconnect()
-    select = "select distinct t.team_id, t.team_name, t.team_emoji, u.full_name from teams t,  reg_users u, ready2play r where t.full_name = u.full_name and t.year = " + str(year) + " and r.date = '"+ str(date) + "' and u.chat_id in (select chat_id from ready2play) order by t.team_id"
+    select = "select distinct t.team_id, t.team_name, t.team_emoji, u.full_name from teams t,  reg_users u, ready2play r where t.full_name = u.full_name and t.year = " + str(year) + " and r.date = '"+ str(date) + "' and u.chat_id in (select chat_id from ready2play where is_ready = TRUE and date = '" + str(date) + "') order by t.team_id"
     ready_teams = db.query(select)
     return ready_teams

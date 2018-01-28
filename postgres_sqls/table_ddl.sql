@@ -41,11 +41,12 @@ CREATE TABLE voroshila.public.tournaments (
 	PRIMARY KEY (tournament_id)
 );
 
---таблица со готовыми к игре участниками
+--таблица со готовыми/неготовыми к игре участниками
 CREATE TABLE voroshila.public.ready2play (
 	rdy_id int4 DEFAULT nextval('ready2play_rdy_id_seq' NOT NULL,
 	chat_id varchar(50),
-	date date
+	date date,
+	is_ready bool
 );
 
 --таблица хранения истории сообщений (/msg, /msgto, /vsmsg
