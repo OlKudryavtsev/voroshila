@@ -41,8 +41,7 @@ def insertnewuser(chat_id, first_name, last_name):
     if check:
         print("this user already exists in table")
     else:
-        ins = db.prepare("INSERT INTO voroshila.public.reg_users (chat_id, first_name, last_name) VALUES  	($1, $2, $3)")
-        ins(chat_id,first_name,last_name)
+        db.query("INSERT INTO voroshila.public.reg_users (chat_id, first_name, last_name) VALUES  	('" + str(chat_id) + "', '" + str(first_name) + "', '" + str(last_name)+ "')")
 
 def getchatids():
     chat_ids = []
@@ -231,9 +230,9 @@ select g.id_game, t1.team_name, g.id_team_one, t1.team_emoji, t2.team_name, g.id
 inner join teams t1 ON g.id_team_one=t1.team_id
 inner join teams t2 ON g.id_team_two=t2.team_id
 where g.id_tournament = """ + str(id_tournament) + """  and g.id_team_one in 
-(select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and year = """ + str(year) + """ and r.date = '""" + str(date) + """') 
+(select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and r.is_ready = TRUE and year = """ + str(year) + """ and r.date = '""" + str(date) + """') 
 and g.id_team_two in
-(select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and year = """ + str(year) + """ and r.date = '""" + str(date) + """')      
+(select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and r.is_ready = TRUE and year = """ + str(year) + """ and r.date = '""" + str(date) + """')      
 order by g.tour, g.id_game
 fetch first 5 rows only
 """

@@ -111,7 +111,7 @@ def teamlist(bot, update):
     i = 0
     for team in TEAMS:
         i = i + 1
-        teamlist = teamlist + "\n" + str(i) + ". " + "\t" + team[2] + "\t" + team[3] + "\t" + team[1]
+        teamlist = teamlist + "\n" + team[2] + "\t" + team[3] + "\t" + team[1]
     update.message.reply_text('Количество зарегистрировавшихся участников - ' + str(i))
     update.message.reply_text('Список участников:\n' + teamlist)
 
@@ -491,9 +491,9 @@ def keyboardecho(bot, update):
         for r in tables:
             row = row + "\n"
             for f in r:
-                row = row + "\t     " + str(f)
+                row = row + " " + str(f)
         tabletxt = tabletxt + "\n" + row
-        update.message.reply_text("Команда\t\tВ\t\tН\t\tП\t\tЗабито\t\tПропущено\t\tРазница\t\tОчки" + tabletxt)
+        update.message.reply_text("Команда В Н П ГЗ ГП Р Очки" + tabletxt)
         #update.message.reply_text(tabletxt)
         gameresult(bot, update)
 
@@ -579,7 +579,7 @@ def ready2play(bot, update, state):
         update.message.reply_text("🙁Очень жаль! Надеюсь, что в следующее воскресенье у тебя получится!")
         for chat_id in LIST_OF_ADMINS:
             bot.send_message(chat_id=chat_id,
-                             text=update.message.from_user.first_name + " " + update.message.from_user.last_name + " сообщил об отмене своей готовности сыграть в ближайшее воскресенье " + str(
+                             text=update.message.from_user.first_name + " " + update.message.from_user.last_name + " сообщил, что не готов сыграть в ближайшее воскресенье " + str(
                                  getnextsunday()))
         team_id = getteamidbytchatid(chat_id, cur_year)
         game_id = getgameidbyteamid(team_id)
