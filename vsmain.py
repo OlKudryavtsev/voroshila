@@ -47,6 +47,7 @@ def main():
 
 
     dp.add_handler(CommandHandler('keyboard', keyboard))
+    dp.add_handler(CommandHandler('table', table))
     dp.add_handler(CommandHandler('yearchoise', yearchoise))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("teamlist", teamlist))

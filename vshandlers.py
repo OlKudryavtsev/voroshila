@@ -3,7 +3,7 @@
 
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ConversationHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup,KeyboardButton
 import logging
 from functools import wraps
 from emoji import emojize
@@ -366,6 +366,8 @@ def keyboardecho(bot, update):
     """Echo the user message."""
     sender_chat_id = update.message.chat_id
     print("We in keyboardecho")
+    chat_ids, firstnames, fullnames = getvschatids()
+    chat_id = update.message.chat_id
     echotext = update.message.text
     queryinsert(sender_chat_id, echotext)
     # echotext = echotext.lower()
@@ -414,45 +416,33 @@ def keyboardecho(bot, update):
 
     elif echotext == "🔜Ближайшие 5️⃣ матчей":
         next5games(bot, update)
-        gamecalendar(bot, update)
+        if str(chat_id) not in chat_ids:
+            notvsplayersmenu(bot, update)
+        else:
+            gamecalendar(bot, update)
 
     elif echotext == "🔜Ближайшие матчи":
         chat_id = update.message.chat_id
-        date = getnextsunday()
-        matches = getplannedgames(date)
-        if len(matches) == 0:
-            next5games(bot, update)
+        plannedgames(bot, update)
+        if str(chat_id) not in chat_ids:
+            notvsplayersmenu(bot, update)
         else:
-            match_text = ""
-            for match in matches:
-                if match[7]:
-                    date_text = str(match[7]) + ": "
-                else:
-                    date_text = ""
-                match_text = match_text + "\n" + date_text + str(match[1]) + str(
-                    match[3]) + " - " + str(match[6]) + str(match[4]) + " " + ". Тур " + str(match[8])
-            update.message.reply_text("На ближайшее воскресенье запланировано проведение следующих матчей:")
-            time.sleep(1)
-            update.message.reply_text(match_text)
-            time.sleep(2)
-        gamecalendar(bot, update)
+            gamecalendar(bot, update)
 
+    elif echotext == "🔜Запланированные матчи":
+        chat_id = update.message.chat_id
+        plannedgames(bot, update)
+        if str(chat_id) not in chat_ids:
+            notvsplayersmenu(bot, update)
+        else:
+            gamecalendar(bot, update)
 
     elif echotext == "🔛Результаты матчей":
-        chat_id = update.message.chat_id
-        matches = getmatchschedule('', '2018', 5, 1)
-        match_text = ""
-        for match in matches:
-            date = ""
-            if match[4]:
-                date = " (" + str(match[4]) + ")"
-            match_text = match_text + "\n" + str(match[0]) + str(match[6]) + " " + str(match[2]) + " - " + str(
-                match[3]) + " " + str(match[7]) + str(match[1]) + str(date)
-        update.message.reply_text("Последние 5️⃣  сыгранных матчей:")
-        time.sleep(1)
-        update.message.reply_text(match_text)
-        time.sleep(2)
-        gameresult(bot, update)
+        gameresults(bot, update)
+        if str(chat_id) not in chat_ids:
+            notvsplayersmenu(bot, update)
+        else:
+            gameresult(bot, update)
 
     elif echotext == "👋🏽Готов!":
         ready2play(bot, update, True)
@@ -484,22 +474,14 @@ def keyboardecho(bot, update):
         gamecalendar(bot, update)
 
     elif echotext == "🗓Турнирная таблица":
-        chat_id = str(update.message.chat_id)
-        tables = gettournamenttable(6)
-        tabletxt = ""
-        row = ""
-        for r in tables:
-            row = row + "\n"
-            for f in r:
-                row = row + " " + str(f)
-        tabletxt = tabletxt + "\n" + row
-        update.message.reply_text("Команда В Н П ГЗ ГП Р Очки" + tabletxt)
-        #update.message.reply_text(tabletxt)
-        gameresult(bot, update)
+        showtable(bot,update)
+        if str(chat_id) not in chat_ids:
+            notvsplayersmenu(bot, update)
+        else:
+            gameresult(bot, update)
 
     else:
         echo(bot, update)
-
 
 # функция создания списка команд
 def teams(bot, update):
@@ -534,6 +516,24 @@ def teams(bot, update):
     update.message.reply_text('Можешь посмотреть результаты матчей другой команды либо вернуться назад:',
                               reply_markup=reply_markup)
 
+def plannedgames(bot, update):
+    date = getnextsunday()
+    matches = getplannedgames(date)
+    if len(matches) == 0:
+        next5games(bot, update)
+    else:
+        match_text = ""
+        for match in matches:
+            if match[7]:
+                date_text = str(match[7]) + ": "
+            else:
+                date_text = ""
+            match_text = match_text + "\n" + date_text + str(match[1]) + str(
+                match[3]) + " - " + str(match[6]) + str(match[4]) + " " + ". Тур " + str(match[8])
+        update.message.reply_text("На ближайшее воскресенье запланировано проведение следующих матчей:")
+        time.sleep(1)
+        update.message.reply_text(match_text)
+        time.sleep(1)
 
 def gamecalendar(bot, update):
     chat_id = update.message.chat_id
@@ -560,6 +560,13 @@ def gamecalendar(bot, update):
         text = 'Если ты готов сыграть в ближайшее воскресенье ' + str(getnextsunday()) + ', жми 👋🏽Готов!'
     update.message.reply_text(text, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
+def notvsplayersmenu(bot, update):
+    reply_keyboard = [["🗓Турнирная таблица", "🔛Результаты матчей"],
+                      ["🔜Ближайшие 5️⃣ матчей", "🔜Запланированные матчи"],
+                          ["🔙Назад"]]
+    text = "Эх, жаль, что ты не принимаешь участие в турнире..."
+    update.message.reply_text(text, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
 def gameresult(bot, update):
     print("we in gameresult")
     chat_id = update.message.chat_id
@@ -570,6 +577,81 @@ def gameresult(bot, update):
 
     update.message.reply_text(text, reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
+def gameresults(bot, update):
+    matches = getmatchschedule('', '2018', 5, 1)
+    match_text = ""
+    for match in matches:
+        date = ""
+        if match[4]:
+            date = " (" + str(match[4]) + ")"
+        match_text = match_text + "\n" + str(match[0]) + str(match[6]) + " " + str(match[2]) + " - " + str(
+            match[3]) + " " + str(match[7]) + str(match[1]) + str(date)
+    update.message.reply_text("Последние 5️⃣  сыгранных матчей:")
+    time.sleep(1)
+    update.message.reply_text(match_text)
+    time.sleep(1)
+
+def build_menu(buttons,
+               n_cols,
+               header_buttons=None,
+               footer_buttons=None):
+    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+    if header_buttons:
+        menu.insert(0, header_buttons)
+    if footer_buttons:
+        menu.append(footer_buttons)
+    return menu
+
+def showtable(bot, update):
+    tables = gettournamenttable(6)
+    #keyboard_list = []
+    keyboard_list = [InlineKeyboardButton("К", callback_data="ignore"), InlineKeyboardButton("И", callback_data="ignore"), InlineKeyboardButton("В", callback_data="ignore"), InlineKeyboardButton("Н", callback_data="ignore"), InlineKeyboardButton("П", callback_data="ignore"),InlineKeyboardButton("ГЗ", callback_data="ignore"),InlineKeyboardButton("ГП", callback_data="ignore"),InlineKeyboardButton("Р", callback_data="ignore"),InlineKeyboardButton("О", callback_data="ignore")]
+    button_list = []
+    for table in tables:
+        i = 0
+        #print(table)
+        #keyboard.append(list(table))
+
+        for col in table:
+            if i > 0:
+                keyboard_list.append(InlineKeyboardButton(str(col), callback_data="ignore"))
+            i = i + 1
+    button_list = keyboard_list
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=9))
+
+    update.message.reply_text('Турнирная таблица на текущий момент:', reply_markup=reply_markup)
+    update.message.reply_text('К - команда, И - количество сыгранных матчей, В - победа, Н - ничья, П - поражение, ГЗ - голов забито, ГП - голов пропущено, Р - разница, О - очки')
+    time.sleep(1)
+    update.message.reply_text('Также можешь посмотреть в текстовом виде таблицу: /table')
+
+
+def table(bot, update):
+    tables = gettournamenttable(6)
+    teamsarr = []
+    tabletxt = ""
+    row = ""
+    for r in tables:
+        teamsarr.append(list(r))
+        for f in r:
+            #teamsarr.append(f)
+            row = row + " " + str(f)
+
+        row = row + "\n"
+
+    tabletxt = tabletxt + "\n" + row
+    update.message.reply_text("Команда И В Н П ГЗ ГП Р Очки" + tabletxt)
+    update.message.reply_text(
+        'К - команда, И - количество сыгранных матчей, В - победа, Н - ничья, П - поражение, ГЗ - голов забито, ГП - голов пропущено, Р - разница, О - очки')
+    #update.message.reply_text(tabletxt)
+    #print(teamsarr)
+    text = ""
+    row_format = "{0:^20} {1:^5} {2:^5} {3:^5} {4:^5} {5:^5} {6:^5} {7:^5} {8:^5} {9:^5}"
+    for oneteam in teamsarr:
+        #print(row_format.format(oneteam[0], oneteam[1], oneteam[2], oneteam[3], oneteam[4], oneteam[5], oneteam[6], oneteam[7], oneteam[8]))
+        text = text + "\n" + row_format.format(oneteam[0], oneteam[1], oneteam[2], oneteam[3], oneteam[4], oneteam[5], oneteam[6], oneteam[7], oneteam[8], oneteam[9])
+        #print(*oneteam)
+    #print_table(teamsarr)
+    #update.message.reply_text(text)
 
 def ready2play(bot, update, state):
     chat_id = update.message.chat_id
@@ -676,11 +758,21 @@ def set(bot, update, args):
 def whoisready(bot, update):
     cur_year = datetime.date.today().year
     date = getnextsunday()
-    ready_teams = getwhoisready(cur_year, date)
+    ready_teams = getwhoisready(cur_year, date, True)
     msg_text = ""
     for ready_team in ready_teams:
         msg_text = msg_text + "\n" + str(ready_team[0]) + ". " + str(ready_team[3]) + "    " + str(ready_team[1]) + " " + str(ready_team[2])
     update.message.reply_text("На данный момент в ближайшее воскресенье " + str(date) + " готовы играть следующие команды:")
+    time.sleep(1)
+    update.message.reply_text(msg_text)
+    time.sleep(1)
+    not_ready_teams = getwhoisready(cur_year, date, False)
+    msg_text = ""
+    for not_ready_team in not_ready_teams:
+        msg_text = msg_text + "\n" + str(not_ready_team[0]) + ". " + str(not_ready_team[3]) + "    " + str(
+            not_ready_team[1]) + " " + str(not_ready_team[2])
+    update.message.reply_text(
+        "Не готовы играть следующие команды:")
     time.sleep(1)
     update.message.reply_text(msg_text)
     time.sleep(1)

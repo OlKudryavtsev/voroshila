@@ -77,14 +77,15 @@ def getteaminfo():
 def gettournamenttable(tid):
     db = dbconnect()
     select = """
-select tm.team_name, 
+select tm.team_name,tm.team_emoji,
+  sum(win) + sum(loss) + sum(draw)as game,
   sum(win) as win, 
   sum(loss) as loss, 
   sum(draw) as draw, 
   sum(goals_s) as goals_s, 
   sum(goals_m) as goals_m,
   sum(goals_s) - sum(goals_m) as goals_d,
-  sum(win)*3 + sum(draw) as points
+  sum(win)*3 + sum(draw) as points 
 from (
 select g.id_team_one as id_team, 
   CASE WHEN g.goals_one>g.goals_two THEN 1 ELSE 0 END as win,
@@ -101,7 +102,7 @@ select g.id_team_two as id_team,
   CASE WHEN g.goals_two IS NOT NULL THEN goals_two ELSE 0 END as goals_s,
   CASE WHEN g.goals_one IS NOT NULL THEN goals_one ELSE 0 END as goals_m
 from games g where id_tournament="""+str(tid)+"""
-) t, teams tm where tm.team_id=t.id_team group by tm.team_name order by points desc, goals_d desc
+) t, teams tm where tm.team_id=t.id_team group by tm.team_name,tm.team_emoji order by points desc, goals_d desc
     """
     table = db.query(select)
     return table
@@ -229,7 +230,7 @@ def getpossiblegames(id_tournament, date, year):
 select g.id_game, t1.team_name, g.id_team_one, t1.team_emoji, t2.team_name, g.id_team_two, t2.team_emoji, g.date, g.tour from games g
 inner join teams t1 ON g.id_team_one=t1.team_id
 inner join teams t2 ON g.id_team_two=t2.team_id
-where g.id_tournament = """ + str(id_tournament) + """  and g.id_team_one in 
+where g.id_tournament = """ + str(id_tournament) + """  and g.goals_one IS NULL and g.id_team_one in 
 (select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and r.is_ready = TRUE and year = """ + str(year) + """ and r.date = '""" + str(date) + """') 
 and g.id_team_two in
 (select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and r.is_ready = TRUE and year = """ + str(year) + """ and r.date = '""" + str(date) + """')      
@@ -298,8 +299,14 @@ def getfullnamebychatid(chat_id):
     first_names = db.query(select)
     return first_names[0][0]
 
-def getwhoisready(year, date):
+def getwhoisready(year, date, state):
     db = dbconnect()
-    select = "select distinct t.team_id, t.team_name, t.team_emoji, u.full_name from teams t,  reg_users u, ready2play r where t.full_name = u.full_name and t.year = " + str(year) + " and r.date = '"+ str(date) + "' and u.chat_id in (select chat_id from ready2play where is_ready = TRUE and date = '" + str(date) + "') order by t.team_id"
+    select = "select distinct t.team_id, t.team_name, t.team_emoji, u.full_name from teams t,  reg_users u, ready2play r where t.full_name = u.full_name and t.year = " + str(year) + " and r.date = '"+ str(date) + "' and u.chat_id in (select chat_id from ready2play where is_ready = " + str(state) + " and date = '" + str(date) + "') order by t.team_id"
     ready_teams = db.query(select)
     return ready_teams
+
+def print_table(table):
+    col_width = [max(len(x) for x in col) for col in zip(*table)]
+    for line in table:
+        print("| " + " | ".join("{:{}}".format(x, col_width[i])
+                                for i, x in enumerate(line)) + " |")
