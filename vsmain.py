@@ -13,7 +13,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler,ConversationHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler,ConversationHandler, RegexHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 import logging
 from functools import wraps
@@ -68,6 +68,7 @@ def main():
     dp.add_handler(CommandHandler('gameresult', gameresult))
     dp.add_handler(CommandHandler('ready2play', ready2play))
     dp.add_handler(CommandHandler('cancel', ready2play))
+    dp.add_handler(RegexHandler(u'^(Всем|всем|ВСЕМ):.*$', sendmessage))
 
     #admin handlers
     dp.add_handler(CommandHandler('admin', admin))

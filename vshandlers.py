@@ -14,6 +14,8 @@ from tabulate import tabulate
 
 import os, fnmatch
 import re
+import apiai
+import json
 
 from vsfunc import *
 
@@ -99,6 +101,7 @@ def help(bot, update):
     text += "\n/links - показать ссылки на GoogleDocs"
     text += "\n/table2017 - показать турнирную таблицу ВС2017"
     text += "\n/msgto - написать сообщение определенному контакту"
+    text += "\nвсем: текст сообщения - написать сообщение всем пользователям"
     text += "\n\nА еще ты можешь мне просто писать 'победители','помощь','покажи таблицу' и т.д."
     update.message.reply_text(text)
 
@@ -202,8 +205,20 @@ def echo(bot, update):
     elif echotext in REGLAMENT_SYNONUMS:
         reglament(bot, update)
     else:
-        update.message.reply_text('К сожалению, я тебя не понял 😔')
-        help(bot, update)
+        apiaicall(bot, update)
+
+def apiaicall(bot, update):
+    request = apiai.ApiAI('f6c3e3934c0e4bb083775d3d2dc9a2ec').text_request()  # Токен API к Dialogflow
+    request.lang = 'ru'  # На каком языке будет послан запрос
+    request.session_id = 'VoroshilaBot'  # ID Сессии диалога (нужно, чтобы потом учить бота)
+    request.query = update.message.text  # Посылаем запрос к ИИ с сообщением от юзера
+    responseJson = json.loads(request.getresponse().read().decode('utf-8'))
+    response = responseJson['result']['fulfillment']['speech']  # Разбираем JSON и вытаскиваем ответ
+    # Если есть ответ от бота - присылаем юзеру, если нет - бот его не понял
+    if response:
+        bot.send_message(chat_id=update.message.chat_id, text=response)
+    else:
+        bot.send_message(chat_id=update.message.chat_id, text='Я Вас не совсем понял!')
 
 
 # функция для отправки пожелания администраторам
@@ -251,36 +266,15 @@ def yearchoise(bot, update):
     update.message.reply_text('Выбери год:', reply_markup=reply_markup)
 
 
-@restricted
-def msg(bot, update, args):
+def sendmessage(bot, update):
     """Send a message when the command /sendmessage is issued."""
     sender_chat_id = update.message.chat_id
-    msg = ' '.join(args)
-    for arg in args:
-        msg = msg + " " + arg
+    msg = re.sub(r'(всем|Всем|ВСЕМ):\s+', '', update.message.text, re.I)
     chat_ids, firstnames, fullnames = getchatids()
     i = 0
-    for chat_id, name in zip(chat_ids, firstnames):
+    for chat_id, name in zip(chat_ids, fullnames):
         i = i + 1
-        if not name:
-            name = "уважаемый участник соревнования"
-        bot.send_message(chat_id=chat_id, text=name + ", " + msg)
-    msginsert(sender_chat_id, '', msg)
-
-@restricted
-def vsmsg(bot, update, args):
-    """Send a message when the command /sendmessage is issued."""
-    sender_chat_id = update.message.chat_id
-    msg = ' '.join(args)
-    #for arg in args:
-    #    msg = msg + " " + arg
-    chat_ids, firstnames, fullnames = getvschatids()
-    i = 0
-    for chat_id, name in zip(chat_ids, firstnames):
-        i = i + 1
-        if not name:
-            name = "уважаемый участник соревнования"
-        bot.send_message(chat_id=chat_id, text=name + ", " + msg)
+        bot.send_message(chat_id=chat_id, text=update.message.from_user.first_name + " " + update.message.from_user.last_name + ":\n" + msg)
     msginsert(sender_chat_id, '', msg)
 
 def msgto(bot, update, args):
@@ -798,6 +792,37 @@ def possiblegames(bot, update):
         time.sleep(1)
         update.message.reply_text(match_text)
 
+@restricted
+def msg(bot, update, args):
+    """Send a message when the command /sendmessage is issued."""
+    sender_chat_id = update.message.chat_id
+    msg = ' '.join(args)
+    #for arg in args:
+    #    msg = msg + " " + arg
+    chat_ids, firstnames, fullnames = getchatids()
+    i = 0
+    for chat_id, name in zip(chat_ids, firstnames):
+        i = i + 1
+        if not name:
+            name = "уважаемый участник соревнования"
+        bot.send_message(chat_id=chat_id, text=name + ", " + msg)
+    msginsert(sender_chat_id, '', msg)
+
+@restricted
+def vsmsg(bot, update, args):
+    """Send a message when the command /sendmessage is issued."""
+    sender_chat_id = update.message.chat_id
+    msg = ' '.join(args)
+    #for arg in args:
+    #    msg = msg + " " + arg
+    chat_ids, firstnames, fullnames = getvschatids()
+    i = 0
+    for chat_id, name in zip(chat_ids, firstnames):
+        i = i + 1
+        if not name:
+            name = "уважаемый участник соревнования"
+        bot.send_message(chat_id=chat_id, text=name + ", " + msg)
+    msginsert(sender_chat_id, '', msg)
 
 @restricted
 def admin(bot, update):
