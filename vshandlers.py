@@ -10,7 +10,6 @@ from emoji import emojize
 import time
 import datetime
 import random
-from tabulate import tabulate
 
 import os, fnmatch
 import re
