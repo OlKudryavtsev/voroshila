@@ -24,7 +24,6 @@ import datetime
 import fnmatch
 import re
 
-import postgresql
 import psycopg2
 import os
 import urllib.parse as urlparse
