@@ -1,1 +1,1 @@
-web: python vsmain.py
+bot: python vsmain.py
