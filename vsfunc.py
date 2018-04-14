@@ -293,9 +293,9 @@ def ins2ready(chat_id, date, state):
     ##db = dbconnect()
     isanswer = answaboutready(chat_id, date)
     if isanswer > 0:
-        insert = "UPDATE .ready2play set is_ready=" + str(state) + " WHERE chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "'"
+        insert = "UPDATE ready2play set is_ready=" + str(state) + " WHERE chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "'"
     else:
-        insert = "INSERT INTO .ready2play (chat_id, date, is_ready) VALUES ('" + str(chat_id) + "', '" + str(date) + "', " + str(state) + ")"
+        insert = "INSERT INTO ready2play (chat_id, date, is_ready) VALUES ('" + str(chat_id) + "', '" + str(date) + "', " + str(state) + ")"
     cursor.execute(insert)
     conn.commit()
     cursor.close()
@@ -304,7 +304,7 @@ def ins2ready(chat_id, date, state):
 def delfromready(chat_id, date):
     conn, cursor = dbconnect()
     ##db = dbconnect()
-    delete = "DELETE FROM .ready2play where chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "'"
+    delete = "DELETE FROM ready2play where chat_id = '" + str(chat_id) + "' and date = '" + str(date) + "'"
     cursor.execute(delete)
     conn.commit()
     cursor.close()
