@@ -370,9 +370,9 @@ def insdate(game_id, date):
     conn, cursor = dbconnect()
     ##db = dbconnect()
     if date != '':
-        update = "UPDATE .games SET date = '" + str(date) + "' WHERE id_game = " + str(game_id)
+        update = "UPDATE games SET date = '" + str(date) + "' WHERE id_game = " + str(game_id)
     else:
-        update = "UPDATE .games SET date = NULL WHERE id_game = " + str(game_id)
+        update = "UPDATE games SET date = NULL WHERE id_game = " + str(game_id)
     cursor.execute(update)
     conn.commit()
     cursor.close()
@@ -382,9 +382,9 @@ def insgoal(game_id, goals_one, goals_two):
     conn, cursor = dbconnect()
     ##db = dbconnect()
     if goals_one != '':
-        update = "UPDATE .games SET goals_one = " + str(goals_one) + ",	goals_two = " + str(goals_two) + " WHERE id_game = " + str(game_id)
+        update = "UPDATE games SET goals_one = " + str(goals_one) + ",	goals_two = " + str(goals_two) + " WHERE id_game = " + str(game_id)
     else:
-        update = "UPDATE .games SET goals_one = NULL,	goals_two = NULL WHERE id_game = " + str(game_id)
+        update = "UPDATE games SET goals_one = NULL,	goals_two = NULL WHERE id_game = " + str(game_id)
     cursor.execute(update)
     conn.commit()
     cursor.close()
