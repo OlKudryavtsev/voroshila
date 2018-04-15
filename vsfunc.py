@@ -490,7 +490,7 @@ def getallplayedgames(year, team = None):
 def insvideoid(game_id, video_id):
     conn, cursor = dbconnect()
     ##db = dbconnect()
-    update = "UPDATE .games SET tg_file_id = '" + str(video_id) + "' WHERE id_game = " + str(game_id)
+    update = "UPDATE games SET tg_file_id = '" + str(video_id) + "' WHERE id_game = " + str(game_id)
     cursor.execute(update)
     conn.commit()
     cursor.close()
