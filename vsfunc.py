@@ -339,7 +339,7 @@ where g.id_tournament = """ + str(id_tournament) + """  and g.goals_one IS NULL 
 and g.id_team_two in
 (select team_id from teams t, ready2play r, reg_users u where t.full_name = u.full_name and u.chat_id = r.chat_id and r.is_ready = TRUE and year = """ + str(year) + """ and r.date = '""" + str(date) + """')      
 order by g.tour, g.id_game
-fetch first 5 rows only
+fetch first 10 rows only
 """
     cursor.execute(select)
     matches = cursor.fetchall()
