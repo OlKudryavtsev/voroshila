@@ -1277,7 +1277,16 @@ def set(bot, update, args):
 
 @restricted
 def setvideo(bot, update, args):
-    game_id = args[0]
-    video_id = args[1]
-    insvideoid(game_id, video_id)
-    update.message.reply_text("Идентификатор видео-файла успешно выставлен")
+    if not args:
+        cur_year = datetime.date.today().year
+        matches = getgameswithoutvideo(cur_year)
+        match_text = ""
+        for match in matches:
+            match_text = match_text + "\n" + str(match[0]) + ".\t" + str(match[1]) + " (" + str(match[2]) + ") " + str(
+                match[3]) + " - " + str(match[4]) + " (" + str(match[5]) + ") " + str(match[6])
+        update.message.reply_text(match_text)
+    else:
+        game_id = args[0]
+        video_id = args[1]
+        insvideoid(game_id, video_id)
+        update.message.reply_text("Идентификатор видео-файла успешно выставлен")

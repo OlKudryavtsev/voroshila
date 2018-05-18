@@ -496,6 +496,24 @@ def insvideoid(game_id, video_id):
     cursor.close()
     ##db.query(update)
 
+# added 18.05.2018: for get played games without video_id
+def getgameswithoutvideo(year):
+    conn, cursor = dbconnect()
+    ##db = dbconnect()
+    select = """
+select  g.id_game, t1.team_name, g.id_team_one, t1.team_emoji, t2.team_name, g.id_team_two, t2.team_emoji, g.date, g.tour from games g
+inner join teams t1 ON g.id_team_one=t1.team_id
+inner join teams t2 ON g.id_team_two=t2.team_id
+where t1.year = """ + str(year) + """ and g.tg_file_id is NULL and g.goals_two IS NOT NULL order by g.tour, g.id_game
+"""
+    cursor.execute(select)
+    matches = cursor.fetchall()
+    conn.commit()
+    cursor.close()
+    ##matches = db.query(select)
+    return matches
+# end add
+
 def print_table(table):
     col_width = [max(len(x) for x in col) for col in zip(*table)]
     for line in table:
