@@ -1217,7 +1217,7 @@ def button(bot, update):
 def set(bot, update, args):
     if not args:
         cur_year = datetime.date.today().year
-        matches = getnext5games(cur_year)
+        matches = getnext15games(cur_year)
         match_text = ""
         for match in matches:
             match_text = match_text + "\n" + str(match[0]) + ".\t" + str(match[1]) + " (" + str(match[2]) + ") " + str(

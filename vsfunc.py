@@ -310,14 +310,14 @@ def delfromready(chat_id, date):
     cursor.close()
     ##db.query(delete)
 
-def getnext5games(year):
+def getnext15games(year):
     conn, cursor = dbconnect()
     ##db = dbconnect()
     select = """
 select  g.id_game, t1.team_name, g.id_team_one, t1.team_emoji, t2.team_name, g.id_team_two, t2.team_emoji, g.date, g.tour from games g
 inner join teams t1 ON g.id_team_one=t1.team_id
 inner join teams t2 ON g.id_team_two=t2.team_id
-where t1.year = """ + str(year) + """ and g.goals_one is NULL order by g.tour, g.id_game fetch first 5 rows only
+where t1.year = """ + str(year) + """ and g.goals_one is NULL order by g.tour, g.id_game fetch first 15 rows only
 """
     cursor.execute(select)
     matches = cursor.fetchall()
