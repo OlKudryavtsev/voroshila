@@ -929,7 +929,7 @@ def ready2play(bot, update, state):
             bot.send_message(chat_id=chat_id,
                              text=update.message.from_user.first_name + " " + update.message.from_user.last_name + " сообщил, что не готов сыграть в ближайшее воскресенье " + str(
                                  getnextsunday()))
-        team_id = getteamidbytchatid(chat_id, cur_year)
+        team_id = getteamidbytchatid(chat_id, 2018)
         game_id = getgameidbyteamid(team_id, date)
         if game_id:
             arr = ["date", game_id]
@@ -955,7 +955,7 @@ def next5games(bot, update):
     chat_id = update.message.chat_id
     date = getnextsunday()
     cur_year = datetime.date.today().year
-    matches = getmatchschedule('', cur_year, 5, 0)
+    matches = getmatchschedule('',2018, 5, 0)
     match_text = ""
     for match in matches:
         date = ""
@@ -973,10 +973,10 @@ def showgamevideo(bot, update, opp_chat_id=None):
     cur_year = datetime.date.today().year
     date = getnextsunday()
     if not opp_chat_id:
-        matches = getallplayedgames(cur_year)
+        matches = getallplayedgames(2018)
     else:
         team = getyourteam(opp_chat_id, 2018)
-        matches = getallplayedgames(cur_year, team)
+        matches = getallplayedgames(2018, team)
     if len(matches) == 0:
         update.message.reply_text("Нет доступных видео")
     else:
@@ -1008,7 +1008,7 @@ def whoisready(bot, update, state):
     cur_year = datetime.date.today().year
     date = getnextsunday()
     if state == True:
-        ready_teams = getwhoisready(cur_year, date, True)
+        ready_teams = getwhoisready(2018, date, True)
         msg_text = ""
         for ready_team in ready_teams:
             msg_text = msg_text + "\n" + str(ready_team[3]) + "; " + str(ready_team[1]) + " " + str(ready_team[2])
@@ -1017,7 +1017,7 @@ def whoisready(bot, update, state):
         update.message.reply_text(msg_text)
 
     elif state == False:
-        not_ready_teams = getwhoisready(cur_year, date, False)
+        not_ready_teams = getwhoisready(2018, date, False)
         msg_text = ""
         for not_ready_team in not_ready_teams:
             msg_text = msg_text + "\n" + str(not_ready_team[3]) + "; " + str(not_ready_team[1]) + " " + str(not_ready_team[2])
@@ -1029,7 +1029,7 @@ def whoisready(bot, update, state):
 def possiblegames(bot, update):
     cur_year = datetime.date.today().year
     date = getnextsunday()
-    matches = getpossiblegames(6, date, cur_year)
+    matches = getpossiblegames(6, date, 2018)
     if len(matches) == 0:
         update.message.reply_text("Из готовых участников невозможно составить пары 😔")
     else:
@@ -1104,7 +1104,7 @@ def showpossiblegames(bot, update):
     button_list = []
     cur_year = datetime.date.today().year
     date = getnextsunday()
-    matches = getpossiblegames(6, date, cur_year)
+    matches = getpossiblegames(6, date, 2018)
     if len(matches) == 0:
         update.message.reply_text("Из готовых участников невозможно составить пары 😔")
     else:
@@ -1217,7 +1217,7 @@ def button(bot, update):
 def set(bot, update, args):
     if not args:
         cur_year = datetime.date.today().year
-        matches = getnext15games(cur_year)
+        matches = getnext15games(2018)
         match_text = ""
         for match in matches:
             match_text = match_text + "\n" + str(match[0]) + ".\t" + str(match[1]) + " (" + str(match[2]) + ") " + str(
@@ -1279,7 +1279,7 @@ def set(bot, update, args):
 def setvideo(bot, update, args):
     if not args:
         cur_year = datetime.date.today().year
-        matches = getgameswithoutvideo(cur_year)
+        matches = getgameswithoutvideo(2018)
         match_text = ""
         for match in matches:
             match_text = match_text + "\n" + str(match[0]) + ".\t" + str(match[1]) + " (" + str(match[2]) + ") " + str(
